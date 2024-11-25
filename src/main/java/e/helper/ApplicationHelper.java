@@ -15,6 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class ApplicationHelper {
@@ -65,7 +66,7 @@ public class ApplicationHelper {
       }
       String remotePath = null, localPath = null;
       for (int i_property = 0; i_property < 2; i_property++) {
-        Node property = (Element)children.item(i_property);
+        Node property = children.item(i_property);
         Node attribute = property.getAttributes().item(0);
         switch (property.getNodeName()) {
         case "remote":
