@@ -10,4 +10,12 @@ public class Element {
     this.remoteFolder = remoteFolder;
     this.localFolder = localFolder;
   }
+
+  public String getPath() {
+    return remoteFolder + name;
+  }
+
+  public String getLocalPath() {
+    return localFolder + name;
+  }
 }
