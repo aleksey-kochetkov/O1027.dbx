@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Repository;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.DbxException;
+import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
+import com.dropbox.core.v2.files.FileMetadata;
+import e.helper.ApplicationHelper;
 import e.model.Element;
 
 @Repository
