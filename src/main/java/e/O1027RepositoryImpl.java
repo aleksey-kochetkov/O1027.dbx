@@ -5,11 +5,16 @@ import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Scanner;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Repository;
 import com.dropbox.core.DbxRequestConfig;
+import com.dropbox.core.DbxAppInfo;
+import com.dropbox.core.DbxWebAuth;
+import com.dropbox.core.TokenAccessType;
+import com.dropbox.core.DbxAuthFinish;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
@@ -53,7 +58,9 @@ public class O1027RepositoryImpl implements O1027Repository {
                                             .newBuilder("O1027").build();
     DbxCredential dbxCredential;
     if (ApplicationHelper.getPropertyO1027RefreshToken() == null) {
-      DbxAppInfo appInfo = new DbxAppInfo(APP_KEY, APP_SECRET);
+      DbxAppInfo appInfo =
+              new DbxAppInfo(ApplicationHelper.getPropertyO1027Key(),
+                             ApplicationHelper.getPropertyO1027Secret());
       DbxWebAuth webAuth = new DbxWebAuth(dbxRequestConfig, appInfo);
       DbxWebAuth.Request.Builder
                                 builder = DbxWebAuth.newRequestBuilder();
@@ -83,7 +90,8 @@ public class O1027RepositoryImpl implements O1027Repository {
                          ApplicationHelper.getPropertyO1027AccessToken(),
                            ApplicationHelper.getPropertyO1027ExpiresAt(),
                         ApplicationHelper.getPropertyO1027RefreshToken(),
-                                                    APP_KEY, APP_SECRET);
+                             ApplicationHelper.getPropertyO1027Key(),
+                             ApplicationHelper.getPropertyO1027Secret());
     dbxClient = new DbxClientV2(dbxRequestConfig, dbxCredential);
   }
 }
