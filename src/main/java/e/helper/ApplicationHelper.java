@@ -1,5 +1,6 @@
 package e.helper;
 
+import java.io.File;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
@@ -18,16 +19,24 @@ import org.slf4j.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+@Component
 public class ApplicationHelper {
   private static final Logger LOGGER =
                         LoggerFactory.getLogger(ApplicationHelper.class);
   private static final String FILE_PROPERTIES = "O1027.properties";
   private static final String FILE_ELEMENTS = "elements.xml";
+  private static String O1027Key;
+  private static String O1027Secret;
+  private static String O1027AccessToken;
+  private static Long O1027ExpiresAt;
   private static String O1027RefreshToken;
   private static List<e.model.Element> O1027Elements = new ArrayList<>();
 
@@ -46,6 +55,27 @@ public class ApplicationHelper {
   }
 
   private static void initFileProperties() {
+    Properties file = new Properties();
+    try (FileInputStream in = new FileInputStream(FILE_PROPERTIES)) {
+      file.load(in);
+      O1027AccessToken = file.getProperty("O1027.access-token");
+      O1027ExpiresAt =
+                      Long.valueOf(file.getProperty("O1027.expires-at"));
+      O1027RefreshToken = file.getProperty("O1027.refresh-token");
+    } catch (Throwable exception) {
+      LOGGER.error(StringHelper.getStackTrace(exception));
+      try (FileInputStream in = new FileInputStream(
+                                     System.getProperty("java.io.tmpdir")
+                               + File.separatorChar + FILE_PROPERTIES)) {
+        file.load(in);
+        O1027AccessToken = file.getProperty("O1027.access-token");
+        O1027ExpiresAt =
+                      Long.valueOf(file.getProperty("O1027.expires-at"));
+        O1027RefreshToken = file.getProperty("O1027.refresh-token");
+      } catch (Throwable exc) {
+        LOGGER.error(StringHelper.getStackTrace(exc));
+      }
+    }
   }
 
   private static void initFileElements()
@@ -89,6 +119,17 @@ public class ApplicationHelper {
       throw new IllegalStateException();
     }
     return node.getNodeValue();
+  }
+
+  private static
+            void setApplicationContext_internal(ApplicationContext ctx) {
+    O1027Key = ctx.getEnvironment().getProperty("O1027.key");
+    O1027Secret = ctx.getEnvironment().getProperty("O1027.secret");
+  }
+
+  @Autowired
+  public void setApplicationContext(ApplicationContext ctx) {
+    setApplicationContext_internal(ctx);
   }
 
   public static void sleep(long millis) {
