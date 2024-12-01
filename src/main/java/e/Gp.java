@@ -15,6 +15,7 @@ public class Gp {
 
   public void download() {
     for (Element element : ApplicationHelper.getPropertyO1027Elements()) {
+      repository.get(element);
       repository.download(element);
     }
   }
