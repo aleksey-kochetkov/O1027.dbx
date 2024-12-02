@@ -42,6 +42,26 @@ public class O1027RepositoryImpl implements O1027Repository {
   }
 
   @Override
+  public void get(Element element) {
+    final String path = element.getPath();
+    FileMetadata metadata;
+    try {
+      metadata = (FileMetadata)dbxClient.files()
+                                       .getMetadataBuilder(path).start();
+      element.setDate(metadata.getClientModified());
+    } catch (GetMetadataErrorException e0) {
+      if (e0.getMessage().equals(
+"Exception in 2/files/get_metadata: {\".tag\":\"path\",\"path\":\"not_found\"}")) {
+        element.setDate(null);
+      } else {
+        throw new RuntimeException(e0);
+      }
+    } catch (DbxException exception) {
+      throw new RuntimeException(exception);
+    }
+  }
+
+  @Override
   public void upload(Element element) {
     try (InputStream in = new FileInputStream(element.getLocalPath())) {
       FileMetadata metadata = dbxClient.files()
