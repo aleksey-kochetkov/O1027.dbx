@@ -140,6 +140,7 @@ public class ApplicationHelper {
     }
   }
 
+  @SafeVarargs
   public static <T> Enumeration<T> enumeration(T... args) {
     return Collections.enumeration(Arrays.asList(args));
   }

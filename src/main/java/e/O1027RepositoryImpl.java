@@ -19,6 +19,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.GetMetadataErrorException;
 import e.helper.ApplicationHelper;
 import e.model.Element;
 
@@ -37,8 +38,27 @@ public class O1027RepositoryImpl implements O1027Repository {
     } catch (IOException | DbxException exception) {
       throw new RuntimeException(exception);
     }
-    LOGGER.info("download() {} {}",
-                              element.getLocalPath(), element.getPath());
+    LOGGER.info("download() {}", element.getLocalPath());
+  }
+
+  @Override
+  public void get(Element element) {
+    final String path = element.getPath();
+    FileMetadata metadata;
+    try {
+      metadata = (FileMetadata)dbxClient.files()
+                                       .getMetadataBuilder(path).start();
+      element.setDate(metadata.getClientModified());
+    } catch (GetMetadataErrorException e0) {
+      if (e0.getMessage().equals(
+"Exception in 2/files/get_metadata: {\".tag\":\"path\",\"path\":\"not_found\"}")) {
+        element.setDate(null);
+      } else {
+        throw new RuntimeException(e0);
+      }
+    } catch (DbxException exception) {
+      throw new RuntimeException(exception);
+    }
   }
 
   @Override

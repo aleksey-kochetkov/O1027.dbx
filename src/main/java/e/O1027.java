@@ -19,11 +19,16 @@ public class O1027 implements CommandLineRunner {
 
   @Override
   public void run(String[] args) {
-    if (args.length == 1 && args[0].equals("--no-operation")) {
-      LOGGER.info("run(): test launch, no operation requested");
+    if (args.length == 1 && (
+                   args[0].equals("--upload") || args[0].equals("-u"))) {
+      gp.upload();
     } else if (args.length == 1 && (
                  args[0].equals("--download") || args[0].equals("-d"))) {
       gp.download();
+    } else if (args.length == 1 && args[0].equals("--no-operation")) {
+      LOGGER.info("run(): test launch, no operation requested");
+    } else {
+      LOGGER.warn("usage: -u | --upload | -d | --download");
     }
   }
 }

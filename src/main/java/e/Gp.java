@@ -1,9 +1,13 @@
 package e;
 
+import java.io.File;
+import java.util.Objects;
+import java.util.Date;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import e.helper.StringHelper;
 import e.helper.ApplicationHelper;
 import e.model.Element;
 
@@ -14,9 +18,21 @@ public class Gp {
   private O1027Repository repository;
 
   public void download() {
-    for (Element element : ApplicationHelper.getPropertyO1027Elements()) {
+    for (Element
+          element : ApplicationHelper.getPropertyO1027Elements()) {
       repository.get(element);
-      repository.download(element);
+      final long local = new File(element.getLocalPath()).lastModified();
+      final long remote = element.getTime();
+      if (local > remote) {
+        LOGGER.warn("skip {} {} > {}", element.getLocalPath(),
+                                  StringHelper.toString(new Date(local)),
+                                StringHelper.toString(new Date(remote)));
+      } else {
+        repository.download(element);
+      }
     }
+  }
+
+  public void upload() {
   }
 }
