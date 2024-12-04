@@ -88,19 +88,21 @@ public class ApplicationHelper {
     NodeList elements = document.getElementsByTagName("element");
     for (int i = 0; i < elements.getLength(); i++) {
       NodeList children = elements.item(i).getChildNodes();
-      if (children.getLength() != 2) {
+      if (children.getLength() < 2) {
         throw new IllegalStateException(String.format(
              "<element> children:%d; expected 2", children.getLength()));
       }
       String remotePath = null, localPath = null;
-      for (int i_property = 0; i_property < 2; i_property++) {
+      for (int i_property = 0;
+                       i_property < children.getLength(); i_property++) {
         Node property = children.item(i_property);
-        Node attribute = property.getAttributes().item(0);
         switch (property.getNodeName()) {
         case "remote":
+          Node attribute = property.getAttributes().item(0);
           remotePath = getPath(attribute);
           break;
         case "local":
+          attribute = property.getAttributes().item(0);
           localPath = getPath(attribute);
           break;
         }

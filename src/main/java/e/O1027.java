@@ -5,11 +5,16 @@ import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringBootApplication
+@DependsOn("applicationHelper")
 public class O1027 implements CommandLineRunner {
-  private static final Logger LOGGER = LoggerFactory.getLogger(O1027.class);
+  private static final Logger LOGGER =
+                        LoggerFactory.getLogger(O1027.class);
+  private static final Logger SL =
+                        LoggerFactory.getLogger("e.helper.SimpleLogger");
   @Autowired
   private Gp gp;
 
@@ -28,7 +33,7 @@ public class O1027 implements CommandLineRunner {
     } else if (args.length == 1 && args[0].equals("--no-operation")) {
       LOGGER.info("run(): test launch, no operation requested");
     } else {
-      LOGGER.warn("usage: -u | --upload | -d | --download");
+      SL.warn("usage: -u | --upload | -d | --download");
     }
   }
 }

@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -19,6 +22,7 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.oauth.DbxCredential;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.WriteMode;
 import com.dropbox.core.v2.files.GetMetadataErrorException;
 import e.helper.ApplicationHelper;
 import e.model.Element;
@@ -27,6 +31,8 @@ import e.model.Element;
 public class O1027RepositoryImpl implements O1027Repository {
   private static final Logger LOGGER =
                       LoggerFactory.getLogger(O1027RepositoryImpl.class);
+  private static final Logger SL =
+                        LoggerFactory.getLogger("e.helper.SimpleLogger");
   private DbxClientV2 dbxClient;
 
   @Override
@@ -38,7 +44,13 @@ public class O1027RepositoryImpl implements O1027Repository {
     } catch (IOException | DbxException exception) {
       throw new RuntimeException(exception);
     }
-    LOGGER.info("download() {}", element.getLocalPath());
+    try {
+      Files.setLastModifiedTime(Paths.get(element.getLocalPath()),
+                                 FileTime.fromMillis(element.getTime()));
+    } catch (IOException exception) {
+      throw new RuntimeException(exception);
+    }
+    SL.info("download() {}", element.getLocalPath());
   }
 
   @Override
@@ -65,11 +77,13 @@ public class O1027RepositoryImpl implements O1027Repository {
   public void upload(Element element) {
     try (InputStream in = new FileInputStream(element.getLocalPath())) {
       FileMetadata metadata = dbxClient.files()
-               .uploadBuilder(element.getPath()).uploadAndFinish(in);
+          .uploadBuilder(element.getPath()).withMode(WriteMode.OVERWRITE)
+                              .withClientModified(element.getLocalDate())
+                                                    .uploadAndFinish(in);
     } catch (IOException | DbxException exception) {
       throw new RuntimeException(exception);
     }
-    LOGGER.info("{} {}", element.getLocalPath(), element.getPath());
+    SL.info("upload() {} {}", element.getLocalPath(), element.getPath());
   }
 
   @PostConstruct
