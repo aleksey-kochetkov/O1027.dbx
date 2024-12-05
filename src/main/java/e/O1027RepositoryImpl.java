@@ -6,9 +6,6 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
-import java.nio.file.Paths;
-import java.nio.file.Files;
-import java.nio.file.attribute.FileTime;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -44,12 +41,8 @@ public class O1027RepositoryImpl implements O1027Repository {
     } catch (IOException | DbxException exception) {
       throw new RuntimeException(exception);
     }
-    try {
-      Files.setLastModifiedTime(Paths.get(element.getLocalPath()),
-                                 FileTime.fromMillis(element.getTime()));
-    } catch (IOException exception) {
-      throw new RuntimeException(exception);
-    }
+    ApplicationHelper.setLastModified(element.getLocalPath(),
+                                                      element.getTime());
     SL.info("download() {}", element.getLocalPath());
   }
 
@@ -75,7 +68,9 @@ public class O1027RepositoryImpl implements O1027Repository {
 
   @Override
   public void upload(Element element) {
-    try (InputStream in = new FileInputStream(element.getLocalPath())) {
+    final String tmpPath = element.isZip() ? element.getTmpPath()
+                                               : element.getLocalPath();
+    try (InputStream in = new FileInputStream(tmpPath)) {
       FileMetadata metadata = dbxClient.files()
           .uploadBuilder(element.getPath()).withMode(WriteMode.OVERWRITE)
                               .withClientModified(element.getLocalDate())

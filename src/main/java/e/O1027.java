@@ -31,7 +31,7 @@ public class O1027 implements CommandLineRunner {
                  args[0].equals("--download") || args[0].equals("-d"))) {
       gp.download();
     } else if (args.length == 1 && args[0].equals("--no-operation")) {
-      LOGGER.info("run(): test launch, no operation requested");
+      SL.info("run(): test launch, no operation requested");
     } else {
       SL.warn("usage: -u | --upload | -d | --download");
     }

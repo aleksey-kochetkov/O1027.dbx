@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.zeroturnaround.zip.ZipUtil;
 import e.helper.StringHelper;
 import e.helper.ApplicationHelper;
 import e.model.Element;
@@ -47,8 +48,17 @@ public class Gp {
                                   StringHelper.toString(new Date(local)),
                                 StringHelper.toString(new Date(remote)));
       } else {
+        zip(element);
         repository.upload(element);
       }
     }
+  }
+
+  private void zip(Element element) {
+    if (!element.isZip()) {
+      return;
+    }
+    final File local = new File(element.getLocalPath());
+    ZipUtil.pack(local, new File(element.getTmpPath()));
   }
 }

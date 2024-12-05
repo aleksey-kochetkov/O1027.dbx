@@ -5,15 +5,19 @@ import java.util.Date;
 
 public class Element {
   private String name;
-  private String remoteFolder;
-  private String localFolder;
+  private String remotePath;
+  private String localPath;
   private Date remoteDate;
   private Date localDate;
 
-  public Element(String name, String remoteFolder, String localFolder) {
+  public Element(String name, String remotePath, String localPath) {
     this.name = name;
-    this.remoteFolder = remoteFolder;
-    this.localFolder = localFolder;
+    this.remotePath = remotePath;
+    this.localPath = localPath;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public void setDate(Date date) {
@@ -33,11 +37,19 @@ public class Element {
   }
 
   public String getPath() {
-    return remoteFolder + name;
+    return remotePath;
   }
 
   public String getLocalPath() {
-    return localFolder + name;
+    return localPath;
+  }
+
+  public String getTmpPath() {
+    return localPath.substring(0, localPath.length() - 1) + ".zip";
+  }
+
+  public boolean isZip() {
+    return name.endsWith(".zip");
   }
 
   @Override

@@ -14,6 +14,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -110,8 +113,7 @@ public class ApplicationHelper {
       String name = remotePath
           .substring(remotePath.lastIndexOf('/') + 1);
       e.model.Element element = new e.model.Element(name,
-                remotePath.substring(0, remotePath.lastIndexOf('/') + 1),
-                 localPath.substring(0, localPath.lastIndexOf('/') + 1));
+                                                  remotePath, localPath);
       O1027Elements.add(element);
     }
   }
@@ -152,6 +154,15 @@ public class ApplicationHelper {
     return new SequenceInputStream(enumeration(
             (InputStream)new ByteArrayInputStream(openingTag.getBytes()),
                    in, new ByteArrayInputStream(closingTag.getBytes())));
+  }
+
+  public static void setLastModified(String path, long millis) {
+    try {
+      Files.setLastModifiedTime(Paths.get(path),
+                                            FileTime.fromMillis(millis));
+    } catch (IOException exception) {
+      throw new RuntimeException(exception);
+    }
   }
 
   public static void storeO1027Properties() {

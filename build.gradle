@@ -9,6 +9,7 @@ repositories {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter'
   implementation 'com.dropbox.core:dropbox-core-sdk:6.0.0'
+  implementation 'org.zeroturnaround:zt-zip:1.17'
 }
 bootRun {
   args = '--no-operation'.split(' ') as List
