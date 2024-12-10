@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.FileSystemUtils;
 import org.zeroturnaround.zip.ZipUtil;
 import e.helper.StringHelper;
 import e.helper.ApplicationHelper;
@@ -32,6 +33,7 @@ public class Gp {
                                 StringHelper.toString(new Date(remote)));
       } else {
         repository.download(element);
+        unzip(element);
       }
     }
   }
@@ -60,5 +62,23 @@ public class Gp {
     }
     final File local = new File(element.getLocalPath());
     ZipUtil.pack(local, new File(element.getTmpPath()));
+  }
+
+  private void unzip(Element element) {
+    if (!element.isZip()) {
+      return;
+    }
+    String str = element.getLocalPath();
+    str = str.substring(0, str.length() - 1) + ".tmp/";
+    FileSystemUtils.deleteRecursively(new File(str));
+    new File(element.getLocalPath()).renameTo(new File(str));
+    final File zip = new File(element.getTmpPath()); 
+    ZipUtil.unpack(zip, new File(element.getLocalPath()));
+    ApplicationHelper.setLastModified(element.getLocalPath(),
+                                                      element.getTime());
+    if (element.isCleanTmp()) {
+      zip.delete();
+    }
+    SL.info("unzip() {}", element.getLocalPath());
   }
 }

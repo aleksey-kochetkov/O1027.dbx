@@ -9,11 +9,14 @@ public class Element {
   private String localPath;
   private Date remoteDate;
   private Date localDate;
+  private boolean cleanTmp;
 
-  public Element(String name, String remotePath, String localPath) {
+  public Element(String name,
+                 String remotePath, String localPath, boolean cleanTmp) {
     this.name = name;
     this.remotePath = remotePath;
     this.localPath = localPath;
+    this.cleanTmp = cleanTmp;
   }
 
   public String getName() {
@@ -50,6 +53,10 @@ public class Element {
 
   public boolean isZip() {
     return name.endsWith(".zip");
+  }
+
+  public boolean isCleanTmp() {
+    return cleanTmp;
   }
 
   @Override

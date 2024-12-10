@@ -96,6 +96,7 @@ public class ApplicationHelper {
              "<element> children:%d; expected 2", children.getLength()));
       }
       String remotePath = null, localPath = null;
+      boolean cleanTmp = true;
       for (int i_property = 0;
                        i_property < children.getLength(); i_property++) {
         Node property = children.item(i_property);
@@ -105,15 +106,28 @@ public class ApplicationHelper {
           remotePath = getPath(attribute);
           break;
         case "local":
-          attribute = property.getAttributes().item(0);
-          localPath = getPath(attribute);
-          break;
+          for (int i_attribute = 0;
+                 i_attribute < property.getAttributes().getLength();
+                                                         i_attribute++) {
+            attribute = property.getAttributes().item(i_attribute);
+            switch (attribute.getNodeName()) {
+            case "path":
+              localPath = attribute.getNodeValue();
+              break;
+            case "clean-tmp":
+              cleanTmp = Boolean.valueOf(attribute.getNodeValue());
+              break;
+            default:
+              throw new IllegalStateException(
+                   String.format("unknown:%s", attribute.getNodeName()));
+            }
+          }
         }
       }
       String name = remotePath
           .substring(remotePath.lastIndexOf('/') + 1);
       e.model.Element element = new e.model.Element(name,
-                                                  remotePath, localPath);
+                                        remotePath, localPath, cleanTmp);
       O1027Elements.add(element);
     }
   }

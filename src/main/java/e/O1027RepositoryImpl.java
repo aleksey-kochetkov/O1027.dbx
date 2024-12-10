@@ -1,10 +1,12 @@
 package e;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Scanner;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.LoggerFactory;
@@ -34,16 +36,19 @@ public class O1027RepositoryImpl implements O1027Repository {
 
   @Override
   public void download(Element element) {
-    try (OutputStream
-           outputStream = new FileOutputStream(element.getLocalPath())) {
+    final String path = element.isZip() ? element.getTmpPath()
+                                                : element.getLocalPath();
+    try (OutputStream outputStream = new FileOutputStream(path)) {
       dbxClient.files().downloadBuilder(element.getPath())
                                                  .download(outputStream);
     } catch (IOException | DbxException exception) {
       throw new RuntimeException(exception);
     }
-    ApplicationHelper.setLastModified(element.getLocalPath(),
+    if (!element.isZip()) {
+      ApplicationHelper.setLastModified(element.getLocalPath(),
                                                       element.getTime());
-    SL.info("download() {}", element.getLocalPath());
+      SL.info("download() {}", element.getLocalPath());
+    }
   }
 
   @Override
@@ -68,15 +73,18 @@ public class O1027RepositoryImpl implements O1027Repository {
 
   @Override
   public void upload(Element element) {
-    final String tmpPath = element.isZip() ? element.getTmpPath()
-                                               : element.getLocalPath();
-    try (InputStream in = new FileInputStream(tmpPath)) {
+    final String path = element.isZip() ? element.getTmpPath()
+                                                : element.getLocalPath();
+    try (InputStream in = new FileInputStream(path)) {
       FileMetadata metadata = dbxClient.files()
           .uploadBuilder(element.getPath()).withMode(WriteMode.OVERWRITE)
                               .withClientModified(element.getLocalDate())
                                                     .uploadAndFinish(in);
     } catch (IOException | DbxException exception) {
       throw new RuntimeException(exception);
+    }
+    if (element.isCleanTmp() && element.isZip()) {
+      new File(element.getTmpPath()).delete();
     }
     SL.info("upload() {} {}", element.getLocalPath(), element.getPath());
   }
