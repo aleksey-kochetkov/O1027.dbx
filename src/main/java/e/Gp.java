@@ -42,8 +42,13 @@ public class Gp {
     for (Element
           element : ApplicationHelper.getPropertyO1027Elements()) {
       repository.get(element);
-      final long local = new File(element.getLocalPath()).lastModified();
+      long local = new File(element.getLocalPath()).lastModified();
       final long remote = element.getTime();
+      final int d = 1000 - (int)(local % 1000);
+      if (d < 1000) {
+        local += d;
+        ApplicationHelper.setLastModified(element.getLocalPath(), local);
+      }
       element.setLocalTime(local);
       if (local <= remote) {
         SL.warn("skip {} {} < {}", element.getLocalPath(),
